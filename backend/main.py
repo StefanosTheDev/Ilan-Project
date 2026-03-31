@@ -1,20 +1,8 @@
-from functools import lru_cache
-
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic_settings import BaseSettings, SettingsConfigDict
 
-
-class Settings(BaseSettings):
-    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
-
-    cors_origins: str = "http://localhost:5173,http://127.0.0.1:5173"
-
-
-@lru_cache
-def get_settings() -> Settings:
-    return Settings()
-
+from config import get_settings
+from routes.chat import router as chat_router
 
 app = FastAPI(title="Ilan Project API")
 
@@ -27,6 +15,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.include_router(chat_router)
 
 
 @app.get("/")
