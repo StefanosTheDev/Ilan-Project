@@ -1,5 +1,8 @@
-from fastapi import FastAPI
+import uuid
+
+from fastapi import FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
 
 from config import get_settings
 from routes.chat import router as chat_router
@@ -15,6 +18,30 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+class InsecureSessionMiddleware(BaseHTTPMiddleware):
+    """Sets an intentionally insecure session cookie for the XSS demo.
+    NOT httponly -> JS can read it. NOT secure -> works over HTTP.
+    samesite=none -> sent cross-site. This is the vulnerability."""
+
+    async def dispatch(self, request: Request, call_next):
+        response: Response = await call_next(request)
+        if "session_token" not in request.cookies:
+            token = f"mcg_sess_{uuid.uuid4().hex}"
+            response.set_cookie(
+                key="session_token",
+                value=token,
+                httponly=False,
+                secure=False,
+                samesite="none",
+                max_age=60 * 60 * 24 * 7,
+                path="/",
+            )
+        return response
+
+
+app.add_middleware(InsecureSessionMiddleware)
 
 app.include_router(chat_router)
 

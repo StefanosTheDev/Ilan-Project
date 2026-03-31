@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 
 function LogoMark({ size = 32, className = '' }: { size?: number; className?: string }) {
-  return <img src="/logo.svg" alt="Meridian Capital" width={size} height={size} className={`logo-icon ${className}`} />
+  return <img src="/logo.svg" alt="Ilan Capital" width={size} height={size} className={`logo-icon ${className}`} />
 }
 
 const NAV_LINKS = ['Home', 'About Us', 'Services', 'Contact']
@@ -76,7 +76,7 @@ const TRUSTED_LOGOS = [
 
 const TESTIMONIALS = [
   {
-    quote: 'Meridian has been our primary allocation partner for over a decade. Their discipline through volatile markets is unmatched.',
+    quote: 'Ilan has been our primary allocation partner for over a decade. Their discipline through volatile markets is unmatched.',
     name: 'Sarah Mitchell',
     title: 'CIO, Lakewood Family Office',
     img: 'https://images.unsplash.com/photo-1551836022-d5d88e9218df?w=200&h=200&fit=crop&crop=face',
@@ -88,7 +88,7 @@ const TESTIMONIALS = [
     img: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop&crop=face',
   },
   {
-    quote: 'Transparent, responsive, and fiercely aligned with our long-term goals. We trust Meridian completely.',
+    quote: 'Transparent, responsive, and fiercely aligned with our long-term goals. We trust Ilan completely.',
     name: 'Elena Vasquez',
     title: 'Treasurer, Horizon Foundation',
     img: 'https://images.unsplash.com/photo-1594744803329-e58b31de8bf5?w=200&h=200&fit=crop&crop=face',
@@ -116,14 +116,14 @@ function SharedConversation({ sessionId }: { sessionId: string }) {
     <div className="shared-page">
       <header className="shared-header">
         <a className="logo" href="/">
-          <LogoMark size={34} /> Meridian Capital
+          <LogoMark size={34} /> Ilan Capital
         </a>
       </header>
       <div className="shared-container">
         <div className="shared-panel">
           <div className="chat-panel-header">
             <LogoMark size={28} className="chat-panel-logo" />
-            <span className="chat-panel-title">Meridian AI</span>
+            <span className="chat-panel-title">Ilan AI</span>
             <span className="shared-badge">Shared conversation</span>
           </div>
           <div className="chat-panel-body">
@@ -146,7 +146,7 @@ function SharedConversation({ sessionId }: { sessionId: string }) {
 function ChatWidget() {
   const [open, setOpen] = useState(false)
   const [messages, setMessages] = useState<{ from: 'user' | 'bot'; text: string }[]>([
-    { from: 'bot', text: 'Welcome to Meridian Capital. How can I assist you today?' },
+    { from: 'bot', text: 'Welcome to Ilan Capital. How can I assist you today?' },
   ])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
@@ -199,7 +199,7 @@ function ChatWidget() {
         <div className="chat-panel">
           <div className="chat-panel-header">
             <LogoMark size={28} className="chat-panel-logo" />
-            <span className="chat-panel-title">Meridian AI</span>
+            <span className="chat-panel-title">Ilan AI</span>
             <div className="chat-panel-header-actions">
               {sessionId && (
                 <button className="chat-panel-share" onClick={shareConversation} aria-label="Share conversation" title="Share conversation">
@@ -242,7 +242,7 @@ function ChatWidget() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && send()}
-              placeholder="Message Meridian AI…"
+              placeholder="Message Ilan AI…"
               disabled={loading}
             />
             <button className={`chat-send ${input.trim() ? 'chat-send--active' : ''}`} onClick={send} aria-label="Send" disabled={!input.trim() || loading}>
@@ -288,7 +288,7 @@ function MainSite() {
       <header className="header">
         <div className="container header-inner">
           <a className="logo" href="#" onClick={() => scrollTo('home')}>
-            <LogoMark size={34} /> Meridian Capital
+            <LogoMark size={34} /> Ilan Capital
           </a>
           <button className="nav-toggle" onClick={() => setMobileNav((v) => !v)} aria-label="Menu">
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
@@ -320,7 +320,7 @@ function MainSite() {
             <p className="hero-eyebrow">Trusted Since 2000</p>
             <h1>Building Legacies Through Intelligent Investing</h1>
             <p>
-              For over two decades, Meridian Capital Group has delivered disciplined, research-driven
+              For over two decades, Ilan Capital Group has delivered disciplined, research-driven
               strategies that preserve and grow wealth across generations.
             </p>
             <div className="hero-actions">
@@ -374,7 +374,7 @@ function MainSite() {
             <p className="section-eyebrow">About the Firm</p>
             <h2 className="section-title">Who We Are</h2>
             <p>
-              Founded in 2000, Meridian Capital Group is a privately held investment management firm
+              Founded in 2000, Ilan Capital Group is a privately held investment management firm
               headquartered in New York. We serve a select group of institutional investors, family
               offices, and high-net-worth individuals who demand rigorous analysis and transparent
               stewardship of their assets.
@@ -477,7 +477,7 @@ function MainSite() {
         <div className="container footer-inner">
           <div className="footer-top">
             <div className="footer-brand">
-              <LogoMark size={34} /> Meridian Capital Group
+              <LogoMark size={34} /> Ilan Capital Group
             </div>
             <div className="footer-cols">
               <div>
@@ -494,14 +494,14 @@ function MainSite() {
               </div>
               <div>
                 <h5>Contact</h5>
-                <a href="#">info@meridiancap.com</a>
+                <a href="#">info@ilancap.com</a>
                 <a href="#">+1 (212) 555-0140</a>
                 <a href="#">New York, NY</a>
               </div>
             </div>
           </div>
           <div className="footer-bottom">
-            <p>© 2026 Meridian Capital Group, LLC. All rights reserved.</p>
+            <p>© 2026 Ilan Capital Group, LLC. All rights reserved.</p>
             <div className="footer-legal-links">
               <a href="#">Privacy Policy</a>
               <a href="#">Terms of Service</a>
