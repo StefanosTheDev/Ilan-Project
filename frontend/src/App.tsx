@@ -109,9 +109,15 @@ function SharedConversation({ sessionId }: { sessionId: string }) {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch(`/api/chat/sessions/${sessionId}`)
-      .then((r) => { if (!r.ok) throw new Error(); return r.json() })
-      .then((data) => setMessages(data.messages))
+    fetch(`/api/chat/sessions/${sessionId}`, { credentials: 'include' })
+      .then((r) => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json() })
+      .then((data) => {
+        if (data.messages && data.messages.length > 0) {
+          setMessages(data.messages)
+        } else {
+          setError(true)
+        }
+      })
       .catch(() => setError(true))
       .finally(() => setLoading(false))
   }, [sessionId])
@@ -292,6 +298,7 @@ function ChatWidget() {
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [sessionId, setSessionId] = useState<string | null>(null)
+  const [shareUrl, setShareUrl] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
   const endRef = useRef<HTMLDivElement>(null)
 
@@ -331,6 +338,7 @@ function ChatWidget() {
     if (!sessionId) return
     const url = `${window.location.origin}/share/${sessionId}`
     navigator.clipboard.writeText(url)
+    setShareUrl(url)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
@@ -374,6 +382,11 @@ function ChatWidget() {
                 </svg>
                 {copied ? 'Link Copied!' : 'Share Chat Snapshot'}
               </button>
+              {shareUrl && (
+                <div className="chat-share-url">
+                  <a href={shareUrl} target="_blank" rel="noopener noreferrer">{shareUrl}</a>
+                </div>
+              )}
             </div>
           )}
           <div className="chat-panel-composer">
