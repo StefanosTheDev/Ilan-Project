@@ -113,7 +113,8 @@ function SharedConversation({ sessionId }: { sessionId: string }) {
       .then((r) => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json() })
       .then((data) => {
         if (data.messages && data.messages.length > 0) {
-          setMessages(data.messages)
+          const welcome = { role: 'assistant', content: 'Welcome to Ilan Capital. How can I assist you today?' }
+          setMessages([welcome, ...data.messages])
         } else {
           setError(true)
         }
