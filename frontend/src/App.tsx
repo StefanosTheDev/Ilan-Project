@@ -95,9 +95,13 @@ const TESTIMONIALS = [
   },
 ]
 
+type User = { id: string; email: string; name: string; role: string }
+
 function scrollTo(id: string) {
   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
 }
+
+/* ─── Shared conversation page (public, no auth required) ─── */
 
 function SharedConversation({ sessionId }: { sessionId: string }) {
   const [messages, setMessages] = useState<{ role: string; content: string }[]>([])
@@ -143,6 +147,143 @@ function SharedConversation({ sessionId }: { sessionId: string }) {
   )
 }
 
+/* ─── Login / Register page ─── */
+
+function LoginPage({ onLogin }: { onLogin: (user: User) => void }) {
+  const [mode, setMode] = useState<'login' | 'register'>('login')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [name, setName] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  const reset = () => { setError(''); setEmail(''); setPassword(''); setName('') }
+
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError('')
+    setLoading(true)
+
+    try {
+      if (mode === 'register') {
+        const regRes = await fetch('/api/auth/register', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ email, password, name }),
+        })
+        if (!regRes.ok) {
+          const data = await regRes.json().catch(() => ({}))
+          throw new Error(data.detail || 'Registration failed')
+        }
+      }
+
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ email, password }),
+      })
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data.detail || 'Invalid credentials')
+      }
+      const user = await res.json()
+      onLogin(user)
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Something went wrong')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div className="login-page">
+      <div className="login-card">
+        <div className="login-header">
+          <LogoMark size={48} />
+          <h1>Ilan Capital</h1>
+          <p>{mode === 'login' ? 'Sign in to your account' : 'Create a new account'}</p>
+        </div>
+
+        <div className="login-tabs">
+          <button
+            className={`login-tab ${mode === 'login' ? 'login-tab--active' : ''}`}
+            onClick={() => { setMode('login'); reset() }}
+            type="button"
+          >
+            Sign In
+          </button>
+          <button
+            className={`login-tab ${mode === 'register' ? 'login-tab--active' : ''}`}
+            onClick={() => { setMode('register'); reset() }}
+            type="button"
+          >
+            Register
+          </button>
+        </div>
+
+        <form onSubmit={submit} className="login-form">
+          {error && <div className="login-error">{error}</div>}
+
+          {mode === 'register' && (
+            <div className="login-field">
+              <label htmlFor="name">Full Name</label>
+              <input
+                id="name"
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="e.g. James Whitfield"
+                required
+                autoFocus
+              />
+            </div>
+          )}
+
+          <div className="login-field">
+            <label htmlFor="email">Email</label>
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@example.com"
+              required
+              autoFocus={mode === 'login'}
+            />
+          </div>
+
+          <div className="login-field">
+            <label htmlFor="password">Password</label>
+            <input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder={mode === 'register' ? 'Choose a password' : 'Enter your password'}
+              required
+            />
+          </div>
+
+          <button type="submit" className="btn btn--lg login-submit" disabled={loading}>
+            {loading
+              ? (mode === 'register' ? 'Creating account...' : 'Signing in...')
+              : (mode === 'register' ? 'Create Account' : 'Sign In')
+            }
+          </button>
+        </form>
+
+        <p className="login-footer-text">
+          Secure client portal &middot; Ilan Capital Group
+        </p>
+      </div>
+    </div>
+  )
+}
+
+/* ─── Chat widget ─── */
+
 function ChatWidget() {
   const [open, setOpen] = useState(false)
   const [messages, setMessages] = useState<{ from: 'user' | 'bot'; text: string }[]>([
@@ -169,6 +310,7 @@ function ChatWidget() {
       const res = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ session_id: sessionId, message: text }),
       })
       if (!res.ok) throw new Error(`HTTP ${res.status}`)
@@ -271,15 +413,9 @@ function ChatWidget() {
   )
 }
 
-export default function App() {
-  const shareMatch = window.location.pathname.match(/^\/share\/(.+)$/)
-  if (shareMatch) {
-    return <SharedConversation sessionId={shareMatch[1]} />
-  }
-  return <MainSite />
-}
+/* ─── Main site ─── */
 
-function MainSite() {
+function MainSite({ user, onLogout, onLoginClick }: { user: User | null; onLogout: () => void; onLoginClick: () => void }) {
   const [mobileNav, setMobileNav] = useState(false)
 
   return (
@@ -305,9 +441,17 @@ function MainSite() {
                 {l}
               </a>
             ))}
-            <a href="#contact" className="btn btn--sm" onClick={() => { setMobileNav(false); scrollTo('contact') }}>
-              Get Started
-            </a>
+            {user ? (
+              <div className="nav-user">
+                <span className="nav-user-name">{user.name}</span>
+                <span className={`nav-user-role nav-user-role--${user.role}`}>{user.role}</span>
+                <button className="btn btn--sm btn--outline nav-logout" onClick={onLogout}>Sign Out</button>
+              </div>
+            ) : (
+              <button className="btn btn--sm" onClick={() => { setMobileNav(false); onLoginClick() }}>
+                Log In
+              </button>
+            )}
           </nav>
         </div>
       </header>
@@ -514,4 +658,54 @@ function MainSite() {
       <ChatWidget />
     </>
   )
+}
+
+/* ─── App root -- router ─── */
+
+export default function App() {
+  const shareMatch = window.location.pathname.match(/^\/share\/(.+)$/)
+  if (shareMatch) {
+    return <SharedConversation sessionId={shareMatch[1]} />
+  }
+  const loginMatch = window.location.pathname === '/login'
+  if (loginMatch) {
+    return <LoginRoute />
+  }
+  return <SiteWithAuth />
+}
+
+function LoginRoute() {
+  const handleLogin = (user: User) => {
+    void user
+    window.location.href = '/'
+  }
+  return <LoginPage onLogin={handleLogin} />
+}
+
+function SiteWithAuth() {
+  const [user, setUser] = useState<User | null>(null)
+  const [checking, setChecking] = useState(true)
+
+  useEffect(() => {
+    fetch('/api/auth/me', { credentials: 'include' })
+      .then((r) => { if (!r.ok) throw new Error(); return r.json() })
+      .then((u) => setUser(u))
+      .catch(() => setUser(null))
+      .finally(() => setChecking(false))
+  }, [])
+
+  const handleLogout = async () => {
+    await fetch('/api/auth/logout', { method: 'POST', credentials: 'include' })
+    setUser(null)
+  }
+
+  const handleLoginClick = () => {
+    window.location.href = '/login'
+  }
+
+  if (checking) {
+    return null
+  }
+
+  return <MainSite user={user} onLogout={handleLogout} onLoginClick={handleLoginClick} />
 }

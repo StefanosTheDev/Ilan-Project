@@ -9,7 +9,9 @@ from supabase import create_client, Client
 
 from config import get_settings
 from repositories.chat_repo import ChatRepository
+from repositories.user_repo import UserRepository
 from services.chat_service import ChatService
+from services.auth_service import AuthService
 
 
 @lru_cache
@@ -28,3 +30,7 @@ def get_chat_service() -> ChatService:
         openai_client=get_openai(),
         repo=ChatRepository(get_supabase()),
     )
+
+
+def get_auth_service() -> AuthService:
+    return AuthService(repo=UserRepository(get_supabase()))
