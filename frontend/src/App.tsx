@@ -300,6 +300,7 @@ function ChatWidget() {
   const [sessionId, setSessionId] = useState<string | null>(null)
   const [shareUrl, setShareUrl] = useState<string | null>(null)
   const [copied, setCopied] = useState(false)
+  const [showShareModal, setShowShareModal] = useState(false)
   const endRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -339,6 +340,7 @@ function ChatWidget() {
     const url = `${window.location.origin}/share/${sessionId}`
     navigator.clipboard.writeText(url)
     setShareUrl(url)
+    setShowShareModal(true)
     setCopied(true)
     setTimeout(() => setCopied(false), 2000)
   }
@@ -382,11 +384,6 @@ function ChatWidget() {
                 </svg>
                 {copied ? 'Link Copied!' : 'Share Chat Snapshot'}
               </button>
-              {shareUrl && (
-                <div className="chat-share-url">
-                  <a href={shareUrl} target="_blank" rel="noopener noreferrer">{shareUrl}</a>
-                </div>
-              )}
             </div>
           )}
           <div className="chat-panel-composer">
@@ -402,6 +399,32 @@ function ChatWidget() {
                 <path d="M12 19V5M5 12l7-7 7 7" />
               </svg>
             </button>
+          </div>
+        </div>
+      )}
+      {showShareModal && shareUrl && (
+        <div className="share-modal-overlay" onClick={() => setShowShareModal(false)}>
+          <div className="share-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="share-modal-header">
+              <h3>Chat Snapshot Link</h3>
+              <button className="share-modal-close" onClick={() => setShowShareModal(false)}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                  <path d="M18 6 6 18M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <p className="share-modal-desc">Anyone with this link can view this conversation:</p>
+            <div className="share-modal-url-box">
+              <a href={shareUrl} target="_blank" rel="noopener noreferrer">{shareUrl}</a>
+            </div>
+            <div className="share-modal-actions">
+              <button className="btn btn--sm" onClick={() => { navigator.clipboard.writeText(shareUrl); setCopied(true); setTimeout(() => setCopied(false), 2000) }}>
+                {copied ? 'Copied!' : 'Copy Link'}
+              </button>
+              <button className="btn btn--sm btn--outline share-modal-open" onClick={() => window.open(shareUrl, '_blank')}>
+                Open in New Tab
+              </button>
+            </div>
           </div>
         </div>
       )}

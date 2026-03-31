@@ -888,25 +888,107 @@ a {
   stroke: #fff;
 }
 
-.chat-share-url {
-  margin-top: 0.35rem;
-  padding: 0.45rem 0.65rem;
-  background: #fff;
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  word-break: break-all;
-  font-size: 0.72rem;
-  line-height: 1.4;
+/* ── Share modal ── */
+.share-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.15s ease-out;
 }
 
-.chat-share-url a {
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.share-modal {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.25);
+  width: 90%;
+  max-width: 540px;
+  padding: 2rem;
+  animation: scaleIn 0.2s ease-out;
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.share-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.share-modal-header h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--accent);
+}
+
+.share-modal-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-muted);
+  padding: 0.25rem;
+  border-radius: 6px;
+  transition: background 0.15s;
+}
+
+.share-modal-close:hover {
+  background: var(--bg-alt);
+  color: var(--text);
+}
+
+.share-modal-desc {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-bottom: 1rem;
+}
+
+.share-modal-url-box {
+  padding: 0.85rem 1rem;
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  word-break: break-all;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin-bottom: 1.25rem;
+}
+
+.share-modal-url-box a {
   color: var(--accent-light);
   text-decoration: underline;
-  text-underline-offset: 2px;
+  text-underline-offset: 3px;
+  font-weight: 500;
 }
 
-.chat-share-url a:hover {
+.share-modal-url-box a:hover {
   color: var(--accent);
+}
+
+.share-modal-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.share-modal-open {
+  border-color: var(--border) !important;
+  color: var(--text) !important;
+}
+
+.share-modal-open:hover {
+  background: var(--bg-alt) !important;
 }
 
 .chat-panel-composer {
