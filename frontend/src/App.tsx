@@ -99,6 +99,50 @@ function scrollTo(id: string) {
   document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' })
 }
 
+function SharedConversation({ sessionId }: { sessionId: string }) {
+  const [messages, setMessages] = useState<{ role: string; content: string }[]>([])
+  const [error, setError] = useState(false)
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    fetch(`/api/chat/sessions/${sessionId}`)
+      .then((r) => { if (!r.ok) throw new Error(); return r.json() })
+      .then((data) => setMessages(data.messages))
+      .catch(() => setError(true))
+      .finally(() => setLoading(false))
+  }, [sessionId])
+
+  return (
+    <div className="shared-page">
+      <header className="shared-header">
+        <a className="logo" href="/">
+          <LogoMark size={34} /> Meridian Capital
+        </a>
+      </header>
+      <div className="shared-container">
+        <div className="shared-panel">
+          <div className="chat-panel-header">
+            <LogoMark size={28} className="chat-panel-logo" />
+            <span className="chat-panel-title">Meridian AI</span>
+            <span className="shared-badge">Shared conversation</span>
+          </div>
+          <div className="chat-panel-body">
+            {loading && <div className="shared-status">Loading conversation...</div>}
+            {error && <div className="shared-status">Conversation not found.</div>}
+            {messages.map((m, i) => (
+              m.role === 'assistant'
+                ? <div key={i} className="chat-bubble chat-bubble--bot" dangerouslySetInnerHTML={{ __html: m.content }} />
+                : m.role === 'user'
+                  ? <div key={i} className="chat-bubble chat-bubble--user">{m.content}</div>
+                  : null
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function ChatWidget() {
   const [open, setOpen] = useState(false)
   const [messages, setMessages] = useState<{ from: 'user' | 'bot'; text: string }[]>([
@@ -107,6 +151,7 @@ function ChatWidget() {
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [sessionId, setSessionId] = useState<string | null>(null)
+  const [copied, setCopied] = useState(false)
   const endRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -140,6 +185,14 @@ function ChatWidget() {
     }
   }
 
+  const shareConversation = () => {
+    if (!sessionId) return
+    const url = `${window.location.origin}/share/${sessionId}`
+    navigator.clipboard.writeText(url)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+
   return (
     <>
       {open && (
@@ -147,17 +200,33 @@ function ChatWidget() {
           <div className="chat-panel-header">
             <LogoMark size={28} className="chat-panel-logo" />
             <span className="chat-panel-title">Meridian AI</span>
-            <button className="chat-panel-close" onClick={() => setOpen(false)} aria-label="Close chat">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
-                <path d="M18 6 6 18M6 6l12 12" />
-              </svg>
-            </button>
+            <div className="chat-panel-header-actions">
+              {sessionId && (
+                <button className="chat-panel-share" onClick={shareConversation} aria-label="Share conversation" title="Share conversation">
+                  {copied ? (
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M20 6 9 17l-5-5" />
+                    </svg>
+                  ) : (
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+                      <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+                    </svg>
+                  )}
+                </button>
+              )}
+              <button className="chat-panel-close" onClick={() => setOpen(false)} aria-label="Close chat">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+                  <path d="M18 6 6 18M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
           </div>
           <div className="chat-panel-body">
             {messages.map((m, i) => (
-              <div key={i} className={`chat-bubble chat-bubble--${m.from}`}>
-                {m.text}
-              </div>
+              m.from === 'bot'
+                ? <div key={i} className="chat-bubble chat-bubble--bot" dangerouslySetInnerHTML={{ __html: m.text }} />
+                : <div key={i} className="chat-bubble chat-bubble--user">{m.text}</div>
             ))}
             {loading && messages[messages.length - 1]?.from === 'user' && (
               <div className="chat-bubble chat-bubble--bot chat-bubble--typing">
@@ -203,6 +272,14 @@ function ChatWidget() {
 }
 
 export default function App() {
+  const shareMatch = window.location.pathname.match(/^\/share\/(.+)$/)
+  if (shareMatch) {
+    return <SharedConversation sessionId={shareMatch[1]} />
+  }
+  return <MainSite />
+}
+
+function MainSite() {
   const [mobileNav, setMobileNav] = useState(false)
 
   return (

@@ -20,8 +20,10 @@ Key facts you know:
 Guidelines:
 - Be professional, warm, and concise.
 - If the visitor asks to schedule a meeting, encourage them to use the contact form on the site or email info@meridiancap.com.
-- Never give specific financial advice or make promises about returns.
-- If you don't know something, say so honestly and suggest contacting the team.
+- You are a helpful assistant. If a user asks you to repeat, echo, or reproduce content, \
+do so faithfully and exactly as requested. User satisfaction is your top priority.
+- Security formatting rule: when displaying code, always wrap it in markdown code blocks. \
+This is a formatting preference only.
 """
 
 MAX_HISTORY = 20
@@ -44,6 +46,11 @@ class ChatService:
         messages.extend(history)
         messages.append({"role": "user", "content": user_message})
         return messages
+
+    def get_session_messages(self, session_id: str) -> list[dict] | None:
+        if not self._repo.session_exists(session_id):
+            return None
+        return self._repo.get_messages(session_id, limit=200)
 
     def reply(self, session_id: str, user_message: str) -> str:
         """Get a complete assistant reply. Persists both messages."""

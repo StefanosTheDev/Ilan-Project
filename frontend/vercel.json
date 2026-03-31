@@ -3,6 +3,10 @@
     {
       "source": "/api/:path*",
       "destination": "https://ilan-project-production.up.railway.app/api/:path*"
+    },
+    {
+      "source": "/share/:path*",
+      "destination": "/index.html"
     }
   ]
 }

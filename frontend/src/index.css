@@ -799,6 +799,13 @@ a {
   flex: 1;
 }
 
+.chat-panel-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.chat-panel-share,
 .chat-panel-close {
   background: none;
   border: none;
@@ -811,6 +818,7 @@ a {
   align-items: center;
   justify-content: center;
 }
+.chat-panel-share:hover,
 .chat-panel-close:hover {
   opacity: 1;
 }
@@ -921,4 +929,62 @@ a {
     bottom: 5rem;
     height: 70vh;
   }
+}
+
+/* ── Shared conversation page ── */
+.shared-page {
+  min-height: 100vh;
+  background: var(--bg-alt, #f5f5f5);
+  display: flex;
+  flex-direction: column;
+}
+.shared-header {
+  background: #fff;
+  border-bottom: 1px solid var(--border, #e5e5e5);
+  padding: 1rem 2rem;
+}
+.shared-header .logo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+  color: inherit;
+  font-weight: 700;
+  font-size: 1.1rem;
+}
+.shared-container {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  padding: 2rem 1rem;
+}
+.shared-panel {
+  width: 100%;
+  max-width: 640px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  max-height: 80vh;
+}
+.shared-panel .chat-panel-header {
+  border-radius: 16px 16px 0 0;
+}
+.shared-panel .chat-panel-body {
+  flex: 1;
+  overflow-y: auto;
+}
+.shared-badge {
+  font-size: 0.65rem;
+  opacity: 0.6;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.shared-status {
+  text-align: center;
+  color: #888;
+  padding: 2rem;
+  font-size: 0.9rem;
 }
